@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.reeking.ssm.dao.AdminUserDao">
+    <resultMap id="AdminUserResult" type="com.reeking.ssm.entity.AdminUser">
+        <result property="id" column="id"></result>
+        <result property="userName" column="user_name"></result>
+        <result property="password" column="password_md5"></result>
+        <result property="userToken" column="user_token"></result>
+        <result property="isDeleted" column="is_deleted"></result>
+        <result property="createTime" column="create_time"></result>
+    </resultMap>
+
+    <!-- 查询用户列表 -->
+    <select id="findAdminUsers" resultMap="AdminUserResult" parameterType="Map">
+        select id, user_name, create_time
+        from tb_admin_user
+        where is_deleted = 0
+        order by id desc
+        <if test="start!=null and limit!=null">
+            limit #{start}, #{limit}
+        </if>
+    </select>
+
+    <!-- 查询用户总数 -->
+    <select id="getTotalUsers" parameterType="Map" resultType="int">
+        select count(*) from tb_admin_user where is_deleted = 0;
+    </select>
+
+    <!-- 根据用户名和密码获取用户记录 -->
+    <select id="getAdminUserByUserNameAndPassword" resultMap="AdminUserResult">
+        select id, user_name, user_token
+        from tb_admin_user
+        where user_name = #{userName} and password_md5 = #{passwordMD5}
+        and is_deleted = 0
+        order by id desc limit 1
+    </select>
+
+    <!-- 根据token获取用户记录 -->
+    <select id="getAdminUserByToken" resultMap="AdminUserResult">
+        select  id, user_name, user_token
+        from tb_admin_user
+        where user_token = #{userToken}
+        and is_deleted = 0
+        order by id desc limit 1
+    </select>
+
+    <!-- 更新用户token -->
+    <update id="updateUserToken">
+        update tb_admin_user set user_token = #{newToken} where id = #{userId} and is_deleted = 0
+    </update>
+
+    <!-- 新增用户 -->
+    <insert id="addUser" parameterType="AdminUser">
+        insert into tb_admin_user(user_name, password_md5)
+        values(#{userName}, #{password})
+    </insert>
+
+    <!-- 批量新增用户 -->
+    <insert id="insertUsersBatch">
+        insert into tb_admin_user(user_name,password_md5) VALUES
+        <foreach collection="adminUsers" index="index" item="adminUser" open="" separator="," close="">
+            (#{adminUser.userName}, #{adminUser.password})
+        </foreach>
+    </insert>
+
+    <!-- 修改用户密码 -->
+    <update id="updateUserPassword">
+        update tb_admin_user
+        set password_md5 = #{newPassword}, user_token = ''
+        where id = #{userId}
+        and is_deleted = 0
+    </update>
+
+    <!-- 根据用户名获取用户记录 -->
+    <select id="getAdminUserByUserName" resultMap="AdminUserResult">
+        select id, user_name
+        from tb_admin_user
+        where user_name = #{userName}
+        and is_deleted = 0
+    </select>
+
+    <!-- 根据用户id获取用户记录 -->
+    <select id="getAdminUserById" resultMap="AdminUserResult">
+        select id, user_name
+        from tb_admin_user
+        where id = #{id}
+        and is_deleted = 0
+        order by id desc limit 1
+    </select>
+
+    <!-- 查询所有用户 -->
+    <select id="getAllAdminUsers" resultMap="AdminUserResult">
+        select id,user_name,is_deleted,create_time from tb_admin_user
+        order by id desc
+    </select>
+
+    <!-- 批量删除用户 -->
+    <update id="deleteBatch">
+        update tb_admin_user
+        set is_deleted=1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>
