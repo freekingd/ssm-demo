@@ -12,7 +12,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jdbc.driver.version>5.1.25</jdbc.driver.version>
+    <jdbc.driver.version>8.0.16</jdbc.driver.version>
     <spring.version>4.2.4.RELEASE</spring.version>
     <java.version>1.8</java.version>
     <jdbc.driver.version>8.0.11</jdbc.driver.version>
